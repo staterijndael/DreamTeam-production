@@ -10,13 +10,19 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type Token struct {
+	UserID uint   `json:"userID"`
+	Token  string `json:"token"`
+	Exp    int64  `json:"exp"`
+}
+
 //отправляет верификационный код через смс указанному пользователю.
 //zenrpc:-1 произошло некое дерьмо
 //zenrpc:2 данный пользователь не найден (неверный пароль или телефон)
 //zenrpc:7 невалидный телефон
 //zenrpc:90 невалидный пароль
 //zenrpc: возвращает ошибку, если была, в противном случае сообщение "oёk"
-func (s *Service) SendSms(phone, password string, isAuth string) (*common.CodeAndMessage, *zenrpc.Error) {
+func (s *Service) SendSms(phone, password string, isAuth string) (*common.CodeAndMessage, *Token, *zenrpc.Error) {
 	if !utils.IsPhone([]byte(phone)) {
 		return nil, errors.New(errors.InvalidPhone, nil, nil)
 	}
@@ -46,7 +52,13 @@ func (s *Service) SendSms(phone, password string, isAuth string) (*common.CodeAn
 		if err != nil {
 			return nil, zenrpc.NewError(-1, err)
 		}
+
+		token, exp, err := generateToken(u.ID, s.conf.SigningAlgorithm, s.conf.JWTIdentityKey)
+		if err != nil {
+			return nil, errors.New(errors.Internal, err, nil)
+		}
+		return common.ResultOK, &Token{UserID: u.ID, Token: token, Exp: exp.Unix()}, nil
 	}
 
-	return common.ResultOK, nil
+	return common.ResultOK, &Token{}, nil
 }
