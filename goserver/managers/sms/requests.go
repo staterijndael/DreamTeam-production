@@ -20,6 +20,12 @@ type smsData struct {
 	SendAfter *string `json:"send_after,omitempty"`
 }
 
+type Token struct {
+	UserID uint   `json:"userID"`
+	Token  string `json:"token"`
+	Exp    int64  `json:"exp"`
+}
+
 var (
 	client = new(http.Client)
 )
@@ -34,8 +40,9 @@ func initRequest(method, key, url string, buf *bytes.Buffer) (*http.Request, err
 	req.Header.Add("X-Service-Key", key)
 	return req, nil
 }
+
 // TODO: здесь был Заман
-func sendSms(key, phone, text string) (*response, error) {
+func sendSms(key, phone, text string) (*response, *Token, error) {
 	bytesOfData, err := json.Marshal(smsData{
 		Receiver:  strings.Replace(phone, "+7", "8", -1),
 		Sender:    sender,
@@ -62,5 +69,5 @@ func sendSms(key, phone, text string) (*response, error) {
 		return nil, ManagerErr{err: err}
 	}
 
-	return byteHandRes, nil
+	return byteHandRes, &Token{}, nil
 }
