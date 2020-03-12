@@ -9,7 +9,7 @@ type RatingOrgConfig struct {
 	gorm.Model
 	OrganizationID uint          `gorm:"column:org_id;unique"`
 	StartTime      uint8         `gorm:"column:start_time;default:16"`
-	WeekDay        time.Weekday  `gorm:"column:week_day;default:3"`
+	WeekDay        time.Weekday  `gorm:"column:week_day;default:4"`
 	Organization   *Organization `gorm:"foreignkey:org_id"`
 }
 
