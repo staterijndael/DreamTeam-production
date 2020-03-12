@@ -38,16 +38,17 @@ func (s *Service) Get(phone string, code int, isAuth string, password string) (*
 		return nil, errors.New(errors.Internal, err, nil)
 	}
 
-	if isAuth != "auth" {
-
-		if codeFromManager, ok := s.sms.Get(u.ID); !ok || codeFromManager != code {
-			return nil, errors.New(errors.InvalidAuthCode, nil, nil)
-		}
+	if isAuth == "auth" {
 
 		hashErr := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
 
 		if hashErr != nil {
 			return nil, errors.New(errors.UserNotFound, hashErr, nil)
+		}
+	} else {
+
+		if codeFromManager, ok := s.sms.Get(u.ID); !ok || codeFromManager != code {
+			return nil, errors.New(errors.InvalidAuthCode, nil, nil)
 		}
 	}
 
