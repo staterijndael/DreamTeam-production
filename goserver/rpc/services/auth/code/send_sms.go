@@ -53,10 +53,6 @@ func (s *Service) SendSms(phone, password string, isAuth string) (*common.CodeAn
 			return nil, zenrpc.NewError(-1, err)
 		}
 
-		token, exp, err := generateToken(u.ID, s.conf.SigningAlgorithm, s.conf.JWTIdentityKey)
-		if err != nil {
-			return nil, errors.New(errors.Internal, err, nil)
-		}
 	}
 
 	return common.ResultOK, nil
