@@ -8,6 +8,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jinzhu/gorm"
 	"github.com/semrush/zenrpc"
+	"golang.org/x/crypto/bcrypt"
 	"time"
 )
 
@@ -23,7 +24,7 @@ type Token struct {
 //zenrpc:7 невалидный телефон
 //zenrpc:82 неверный код аутентификации
 //zenrpc:return токен или ошибка
-func (s *Service) Get(phone string, code int, isAuth string) (*Token, *zenrpc.Error) {
+func (s *Service) Get(phone string, code int, isAuth string, password string) (*Token, *zenrpc.Error) {
 	if !utils.IsPhone([]byte(phone)) {
 		return nil, errors.New(errors.InvalidPhone, nil, nil)
 	}
@@ -41,6 +42,12 @@ func (s *Service) Get(phone string, code int, isAuth string) (*Token, *zenrpc.Er
 
 		if codeFromManager, ok := s.sms.Get(u.ID); !ok || codeFromManager != code {
 			return nil, errors.New(errors.InvalidAuthCode, nil, nil)
+		}
+
+		hashErr := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
+
+		if hashErr != nil {
+			return nil, errors.New(errors.UserNotFound, hashErr, nil)
 		}
 	}
 

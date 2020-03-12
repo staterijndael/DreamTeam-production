@@ -22,7 +22,7 @@ type Token struct {
 //zenrpc:7 невалидный телефон
 //zenrpc:90 невалидный пароль
 //zenrpc: возвращает ошибку, если была, в противном случае сообщение "oёk"
-func (s *Service) SendSms(phone, password string, isAuth string) (*common.CodeAndMessage, *Token, *zenrpc.Error) {
+func (s *Service) SendSms(phone, password string, isAuth string) (*common.CodeAndMessage, *zenrpc.Error) {
 	if !utils.IsPhone([]byte(phone)) {
 		return nil, errors.New(errors.InvalidPhone, nil, nil)
 	}
@@ -57,8 +57,7 @@ func (s *Service) SendSms(phone, password string, isAuth string) (*common.CodeAn
 		if err != nil {
 			return nil, errors.New(errors.Internal, err, nil)
 		}
-		return common.ResultOK, &Token{UserID: u.ID, Token: token, Exp: exp.Unix()}, nil
 	}
 
-	return common.ResultOK, &Token{}, nil
+	return common.ResultOK, nil
 }
