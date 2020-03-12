@@ -23,7 +23,7 @@ type Token struct {
 //zenrpc:7 невалидный телефон
 //zenrpc:82 неверный код аутентификации
 //zenrpc:return токен или ошибка
-func (s *Service) Get(phone string, code int) (*Token, *zenrpc.Error) {
+func (s *Service) Get(phone string, code int, isAuth string) (*Token, *zenrpc.Error) {
 	if !utils.IsPhone([]byte(phone)) {
 		return nil, errors.New(errors.InvalidPhone, nil, nil)
 	}
@@ -37,9 +37,12 @@ func (s *Service) Get(phone string, code int) (*Token, *zenrpc.Error) {
 		return nil, errors.New(errors.Internal, err, nil)
 	}
 
- 	if codeFromManager, ok := s.sms.Get(u.ID); !ok || codeFromManager != code {
- 		return nil, errors.New(errors.InvalidAuthCode, nil, nil)
- 	}
+	if isAuth != "auth" {
+
+		if codeFromManager, ok := s.sms.Get(u.ID); !ok || codeFromManager != code {
+			return nil, errors.New(errors.InvalidAuthCode, nil, nil)
+		}
+	}
 
 	token, exp, err := generateToken(u.ID, s.conf.SigningAlgorithm, s.conf.JWTIdentityKey)
 	if err != nil {

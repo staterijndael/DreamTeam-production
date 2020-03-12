@@ -40,12 +40,12 @@ func (s *Service) SendSms(phone, password string, isAuth string) (*common.CodeAn
 		return nil, errors.New(errors.UserNotFound, hashErr, nil)
 	}
 
-	if isAuth == "auth" {
+	if isAuth != "auth" {
 
-		 	_, err := s.sms.Send(u.ID, formattedPhone)
-		 	if err != nil {
-		 		return nil, zenrpc.NewError(-1, err)
-		 	}
+		_, err := s.sms.Send(u.ID, formattedPhone)
+		if err != nil {
+			return nil, zenrpc.NewError(-1, err)
+		}
 	}
 
 	return common.ResultOK, nil
