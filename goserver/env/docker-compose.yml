@@ -1,0 +1,82 @@
+version: '3.2'
+
+services:
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile.zombodb
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    ports:
+      - "9006:5432"
+    networks:
+      - dt.net
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: "123"
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.8.3
+    volumes:
+      - type: bind
+        source: ./elasticsearch.yml
+        target: /usr/share/elasticsearch/config/elasticsearch.yml
+        read_only: true
+      - elastic_data:/usr/share/elasticsearch/data:rw
+    ports:
+      - "9001:9200"
+      - "9002:9300"
+    restart: always
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+      ELASTIC_PASSWORD: dreamteam
+    networks:
+      - dt.net
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:6.8.3
+    volumes:
+      - type: bind
+        source: ./logstash.yml
+        target: /usr/share/logstash/config/logstash.yml
+        read_only: true
+      - type: bind
+        source: ./logstash.conf
+        target: /usr/share/logstash/pipeline/logstash.conf
+        read_only: true
+    restart: always
+    ports:
+      - "9003:5000"
+      - "9004:9600"
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    networks:
+      - dt.net
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:6.8.3
+    volumes:
+      - type: bind
+        source: ./kibana.yml
+        target: /usr/share/kibana/config/kibana.yml
+        read_only: true
+    restart: always
+    ports:
+      - "9005:5601"
+    networks:
+      - dt.net
+    depends_on:
+      - elasticsearch
+
+volumes:
+  elastic_data:
+    driver: local
+  pg_data:
+    driver: local
+
+networks:
+  dt.net:
+    driver: bridge
+

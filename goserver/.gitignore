@@ -1,0 +1,16 @@
+.idea/
+
+media/*
+
+!media/.gitkeep
+!media/default
+**/*_zenrpc.go
+**/*_gen.go
+
+bug/*
+!bug/report/.gitkeep
+
+*.base64
+
+**/wire_gen.go
+/gen.log

@@ -1,0 +1,34 @@
+services:
+  - docker:dind
+ 
+
+stages:
+  - build
+  - deploy
+
+build:
+  stage: build
+  except:
+    - production
+  script:
+    - cd ./goserver
+    - docker build -t localhost:5000/dt:$CI_COMMIT_SHA --no-cache .
+
+deploy:
+  stage: deploy
+  only:
+    - master
+  script:
+    - docker tag localhost:5000/dt:$CI_COMMIT_SHA localhost:5000/dt:latest
+    - docker stop goserver
+    - docker rm goserver
+    - docker run --net host --log-driver gelf --log-opt gelf-address=tcp://localhost:9003 --restart always --name goserver -v /home/dreamteam/v2.media/media:/app/media -v /home/dreamteam/c.json:/app/c.json -d localhost:5000/dt:$CI_COMMIT_SHA /app/dt --config c.json
+
+production:
+  stage: deploy
+  only:
+    - production
+  script:
+    - docker tag localhost:5000/dt:latest docker.dreamteam.team/dt:latest
+    - docker push docker.dreamteam.team/dt:latest
+    - ssh vds "docker pull localhost:8999/dt:latest && docker stop goserver && docker rm goserver && docker run --net host  --restart always --name goserver -d -v /home/dreamteam/app.media.d:/app/media -v /home/dreamteam/app.config.d/prod.json:/app/c.json localhost:8999/dt:latest /app/dt --config c.json"
