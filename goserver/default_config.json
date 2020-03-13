@@ -13,7 +13,7 @@
   "defaultOrgImagePath": "./media/default/org.png.base64",
   "defaultUserImagePath": "./media/default/group.png.base64",
   "version": "2.0",
-  "apiFnsKey": "AAAAohlGFmI:APA91bE0Ppi8lx3_8TNCLq9SqPegUwDDuvPx6_G0umwQguOAyE1Z8CvUBU3sgkTdKGLSrhktESWOxrwzqd87n_uisTfk5Xm-5bnxEBCnpOQPThAAA-_4KqGej3KtxTYtOmZgBEc9a-KS\n",
+  "apiFnsKey": "e94f081e2945d7d8a5fd46bd516fc17139bd544d",
   "host": "0.0.0.0",
   "port": 9003,
   "notificationManagerChannelBufferSize": 100000,
