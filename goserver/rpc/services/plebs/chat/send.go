@@ -1,6 +1,7 @@
 package chat
 
 import (
+	"bytes"
 	"context"
 	"dt/events"
 	"dt/models"
@@ -9,6 +10,7 @@ import (
 	"dt/views"
 	"github.com/jinzhu/gorm"
 	"github.com/semrush/zenrpc"
+	"net/http"
 )
 
 //zenrpc:72 чат не найден
@@ -30,7 +32,7 @@ func (s *Service) SendMessage(ctx context.Context, cid uint, text string) (*view
 	}
 
 	msg := models.Message{
-		Text: text,
+		Text:     text,
 		SenderID: me.ID,
 		ChatID:   cid,
 	}
@@ -47,6 +49,14 @@ func (s *Service) SendMessage(ctx context.Context, cid uint, text string) (*view
 	if err := s.db.First(&msg, msg.ID).Error; err != nil {
 		return nil, errors.New(errors.Internal, nil, nil)
 	}
+
+	data := bytes.NewReader([]byte(`{
+	"message":"assadasd",
+	"chat":"2",
+	"title":"dada"
+}`))
+
+	http.Post("localhost:8080/sendmessage", "application/json", data)
 
 	return views.MsgFromModel(&msg), nil
 }
