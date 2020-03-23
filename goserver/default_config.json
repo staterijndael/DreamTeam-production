@@ -1,6 +1,6 @@
 {
   "postgresHost": "localhost",
-  "postgresPort": 9006,
+  "postgresPort": 5432,
   "postgresPassword": "123",
   "postgresSSLMode": "disable",
   "postgresDBName": "dreamteam",
