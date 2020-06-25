@@ -51,6 +51,7 @@ func Injector(c *config.Config) (*gin.Engine, func(), error) {
 	wire.Build(
 		handlers.InitHandlers,
 		managers.ProviderSet,
+		initer.Claserize("172.68.52.57"),
 		stores.InitDB,
 		rpc.ProviderSet,
 		controller.NewServer,
